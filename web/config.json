@@ -1,0 +1,61 @@
+{
+  "regions": [
+    {
+      "id": "metro-vancouver",
+      "name": "Metro Vancouver & Langley",
+      "bbox": [
+        49.0,
+        -123.4,
+        49.45,
+        -122.4
+      ],
+      "center": [
+        49.16,
+        -122.9
+      ]
+    },
+    {
+      "id": "halifax",
+      "name": "Halifax region",
+      "bbox": [
+        44.35,
+        -63.9,
+        44.95,
+        -63.2
+      ],
+      "center": [
+        44.6488,
+        -63.5752
+      ]
+    }
+  ],
+  "defaultRegion": "metro-vancouver",
+  "presets": [
+    {
+      "name": "Willoughby",
+      "region": "metro-vancouver",
+      "lat": 49.1575,
+      "lon": -122.6652
+    },
+    {
+      "name": "Vancouver",
+      "region": "metro-vancouver",
+      "lat": 49.2827,
+      "lon": -123.1207
+    },
+    {
+      "name": "Halifax",
+      "region": "halifax",
+      "lat": 44.6488,
+      "lon": -63.5752
+    }
+  ],
+  "sourceUrl": "https://overpass.private.coffee/api/interpreter",
+  "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "tileAttribution": "\u00a9 OpenStreetMap contributors",
+  "minimumRecordsPerRegion": 1,
+  "maximumRecords": 12000,
+  "maximumDropFraction": 0.5,
+  "retainedCaptures": 8,
+  "pageSize": 30
+}

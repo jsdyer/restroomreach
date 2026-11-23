@@ -1,21 +1,12 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import { cleanLines } from '../web/model.mjs';
-test('trims, removes blanks and preserves first-seen order', () => {
-  assert.deepEqual(cleanLines('  Halifax\nLangley\nHalifax\n\nVancouver  '), {
-    text: 'Halifax\nLangley\nVancouver', count: 3, removed: 1,
-  });
-});
-test('supports Windows and old Mac line endings', () => {
-  assert.equal(cleanLines('a\r\nb\ra').text, 'a\nb');
-});
-test('empty text and whitespace produce an empty result', () => {
-  assert.deepEqual(cleanLines(' \n\t'), { text: '', count: 0, removed: 0 });
-});
-test('preserves case and Unicode', () => {
-  assert.equal(cleanLines('Québec\nquébec\n東京\nQuébec').text, 'Québec\nquébec\n東京');
-});
-test('treats markup as ordinary text', () => {
-  assert.equal(cleanLines('<script>alert(1)</script>\n<script>alert(1)</script>').text, '<script>alert(1)</script>');
-});
-test('rejects non-text input', () => { assert.throws(() => cleanLines(null), TypeError); });
+import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {validateCapture,coordinates,distance,label,tagLabel,selectRecords,sourceUrl,changes,csv} from '../web/model.mjs';
+const record=(id,tags={},lat=49,lon=-123)=>({id:'node/'+id,lat,lon,tags,regions:['a'],osmUpdatedAt:'2025-01-01T00:00:00Z'});
+const cap=records=>({schema:'coolcode.restroomreach.v1',capturedAt:'2026-11-23T10:00:00Z',sourceUpdatedAt:'2026-07-15T00:00:00Z',scope:'a',regions:[{id:'a',name:'Area',bbox:[48,-124,50,-122]}],records});
+test('coordinate zero is valid; missing and impossible values rejected',()=>{assert.deepEqual(coordinates('0','0'),{lat:0,lon:0});for(const pair of [['','0'],['91','0'],['1','181'],['abc','0']])assert.throws(()=>coordinates(...pair));});
+test('great-circle distance handles identical points, meridian and dateline',()=>{assert.equal(distance({lat:0,lon:0},{lat:0,lon:0}),0);assert.ok(Math.abs(distance({lat:0,lon:0},{lat:1,lon:0})-111.195)<.01);assert.ok(distance({lat:0,lon:179.9},{lat:0,lon:-179.9})<23);});
+test('missing access and accessibility stay unknown, never implied yes',()=>{assert.equal(tagLabel('wheelchair',undefined),'Not recorded');const rows=[record(1),record(2,{wheelchair:'no'}),record(3,{wheelchair:'yes'})];assert.deepEqual(selectRecords(rows,{wheelchair:'unknown'}).map(r=>r.id),['node/1']);assert.deepEqual(selectRecords(rows,{wheelchair:'yes'}).map(r=>r.id),['node/3']);});
+test('mapped public filter excludes absent, customer and private access',()=>{const rows=['yes','public','permissive','customers','private',undefined].map((v,i)=>record(i+1,v?{access:v}:{}));assert.equal(selectRecords(rows,{access:'public'}).length,3);assert.equal(selectRecords(rows,{access:'unknown'}).length,1);});
+test('search and distance use all supplied records beyond default entities',()=>{const rows=[record(1,{name:'A'},49,-123),record(2,{operator:'New district'},50,-123)];assert.equal(selectRecords(rows,{query:'new district'})[0].id,'node/2');assert.equal(selectRecords(rows,{point:{lat:50,lon:-123},maxDistance:1})[0].id,'node/2');});
+test('receipts reject unsafe identities, duplicate IDs and bad coordinates',()=>{for(const rows of [[record('bad')],[record(1),record(1)],[record(1,{},NaN,-123)]])assert.throws(()=>validateCapture(cap(rows)));assert.equal(validateCapture(cap([record(1)])).records.length,1);assert.throws(()=>sourceUrl({id:'javascript:alert(1)'}));});
+test('capture comparison distinguishes absence from changed tags and scope',()=>{const old=cap([record(1),record(2)]),now=cap([record(1,{fee:'no'}),record(3)]);assert.deepEqual(changes(old,now),{comparable:true,added:['node/3'],absent:['node/2'],changed:['node/1']});assert.deepEqual(changes(old,{...now,scope:'other'}),{comparable:false});});
+test('CSV preserves provenance and neutralizes spreadsheet formulas',()=>{const c=cap([record(1,{name:'=HYPERLINK("x")'})]);const text=csv(selectRecords(c.records),c);assert.ok(text.includes("'=HYPERLINK"));assert.ok(text.includes('ODbL-1.0'));assert.ok(text.includes('https://www.openstreetmap.org/node/1'));});
+test('bundled real capture validates and count agrees with index',()=>{const index=JSON.parse(readFileSync(new URL('../web/data/index.json',import.meta.url)));const data=validateCapture(JSON.parse(readFileSync(new URL('../web/data/'+index.captures[0].file,import.meta.url))));assert.equal(data.records.length,index.count);assert.ok(data.records.some(r=>r.regions.includes('halifax')));assert.ok(data.records.some(r=>r.regions.includes('metro-vancouver')));});

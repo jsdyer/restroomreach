@@ -1,34 +1,242 @@
 <!doctype html>
-<html lang="en-CA">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="{{DESCRIPTION}}">
-  <title>{{TITLE}} · CoolCode</title>
-  <link rel="stylesheet" href="./style.css">
-  <script type="module" src="./app.mjs"></script>
-  {{VISIT_COUNTER}}
-</head>
-<body data-tool-id="{{TOOL_ID}}">
-  <a class="skip" href="#main">Skip to content</a>
-  <header><a href="https://coolcode.ca/">← CoolCode.ca</a><a href="{{SOURCE_URL}}">Source &amp; instructions ↗</a></header>
-  <main id="main">
-    <p class="eyebrow">Browser tool starter</p>
-    <h1>{{TITLE}}</h1>
-    <p class="intro">{{DESCRIPTION}}</p>
-    <section aria-labelledby="example-title">
-      <h2 id="example-title">Clean a list</h2>
-      <p>Trim spaces, skip blank lines and remove exact duplicates. Capitalization stays distinct.</p>
-      <div class="panels">
-        <div><label for="input">Your lines</label><textarea id="input" rows="10" maxlength="100000" spellcheck="false" placeholder="Paste one item per line"></textarea></div>
-        <div><label for="output">Cleaned lines</label><textarea id="output" rows="10" readonly spellcheck="false"></textarea></div>
-      </div>
-      <div class="actions"><button id="sample" type="button">Load example</button><button id="clear" type="button">Clear</button><button id="copy" type="button" hidden>Copy result</button></div>
-      <p id="status" role="status" aria-live="polite">Paste a list to begin.</p>
-      <noscript><p>This tool needs JavaScript to process your text. The source is available above.</p></noscript>
-    </section>
-    <aside aria-label="Privacy"><strong>Stays on your device.</strong> The browser processes your text in this tab. Reloading clears it.</aside>
-  </main>
-  <footer>Part of <a href="https://coolcode.ca/">the CoolCode collection</a>. {{ISSUE_LINK}}</footer>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>{{TITLE}} · CoolCode</title>
+<link rel="canonical" href="https://coolcode.ca/{{TOOL_ID}}/">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="./style.css">
+<script defer src="vendor/leaflet/leaflet.js">
+</script>
+<script type="module" src="app.mjs">
+</script>{{VISIT_COUNTER}}</head>
+<body>
+<a class="skip" href="#explore">Skip to the finder</a>
+<header>
+<a class="brand" href="https://coolcode.ca/">CoolCode<span>EVERYDAY INFRASTRUCTURE</span>
+</a>
+<nav>
+<a href="#method">Sources & method</a>
+<a href="{{SOURCE_URL}}">Source code</a>
+</nav>
+</header>
+<main>
+<section class="hero">
+<div>
+<p class="eyebrow">A LITTLE MORE CERTAINTY, ON THE WAY</p>
+<h1>Restroom<br>
+<em>Reach.</em>
+</h1>
+<p class="intro">Find a place to stop.<br>Know what’s mapped before you go.</p>
+<p class="hero-note">Community-mapped washrooms, with accessibility details, source links and room for the unknown.</p>
+<a class="hero-link" href="#explore">Find a washroom</a>
+</div>
+<div class="hero-art" aria-hidden="true">
+<svg viewBox="0 0 400 330">
+<path class="route" d="M32 235Q60 100 170 140T344 65"/>
+<path class="street" d="M40 300L120 60M13 155L366 275M220 320L286 34M70 32L375 123"/>
+<circle cx="47" cy="214" r="16" class="dot"/>
+<circle cx="199" cy="146" r="14" class="dot hollow"/>
+<g transform="translate(280 28)">
+<path class="pin" d="M50 0a50 50 0 0 1 50 50c0 36-50 93-50 93S0 86 0 50A50 50 0 0 1 50 0z"/>
+<circle cx="50" cy="48" r="30" fill="#fff"/>
+<path d="M48 27h4v43h-4zM30 38h12v24H30zM58 38h12v24H58z" fill="#382959"/>
+</g>
+</svg>
+<span>MAP DETAILS.<br>MAKE YOUR OWN CALL.</span>
+</div>
+</section>
+<div class="edition">
+<p id="coverage">Loading the retained map…</p>
+<p id="captured">
+</p>
+</div>
+<section id="explore" aria-labelledby="finder-title">
+<div class="section-heading">
+<div>
+<p class="eyebrow">THE NEARBY DETAILS</p>
+<h2 id="finder-title">A useful stop.</h2>
+</div>
+<div class="actions">
+<button id="save" disabled>Save receipt JSON</button>
+<button id="export" disabled>Export results CSV</button>
+<label class="file-button" for="import">Import receipt<input id="import" type="file" accept=".json,application/json">
+</label>
+</div>
+</div>
+<div class="controls">
+<div class="field">
+<label for="region">Region</label>
+<select id="region">
+</select>
+</div>
+<div class="field">
+<label for="capture">Dated capture</label>
+<select id="capture">
+</select>
+</div>
+<div class="field search">
+<label for="query">Find a name, operator or tag</label>
+<input id="query" type="search" placeholder="Park, library, station…">
+</div>
+<div class="field">
+<label for="wheelchair">Wheelchair</label>
+<select id="wheelchair">
+<option value="">All reported states</option>
+<option value="yes">Mapped yes</option>
+<option value="limited">Mapped limited</option>
+<option value="no">Mapped no</option>
+<option value="unknown">Not recorded</option>
+</select>
+</div>
+<div class="field">
+<label for="access">Access</label>
+<select id="access">
+<option value="">All access states</option>
+<option value="public">Public / permissive mapped</option>
+<option value="customers">Customers only</option>
+<option value="private">Private</option>
+<option value="no">Prohibited</option>
+<option value="unknown">Not recorded</option>
+</select>
+</div>
+<div class="field">
+<label for="fee">Fee</label>
+<select id="fee">
+<option value="">Any / unknown</option>
+<option value="no">No fee mapped</option>
+<option value="yes">Fee required</option>
+<option value="unknown">Not recorded</option>
+</select>
+</div>
+<div class="field">
+<label for="changing">Changing table</label>
+<select id="changing">
+<option value="">Any / unknown</option>
+<option value="yes">Mapped yes</option>
+<option value="no">Mapped no</option>
+<option value="limited">Mapped limited</option>
+<option value="unknown">Not recorded</option>
+</select>
+</div>
+<button id="reset" class="quiet">Clear filters</button>
+</div>
+<details class="nearby">
+<summary>Sort by distance from a point</summary>
+<form id="point-form">
+<div class="field">
+<label for="latitude">Latitude</label>
+<input id="latitude" type="number" step="any" min="-90" max="90" placeholder="49.1575">
+</div>
+<div class="field">
+<label for="longitude">Longitude</label>
+<input id="longitude" type="number" step="any" min="-180" max="180" placeholder="-122.6652">
+</div>
+<div class="field">
+<label for="radius">Within</label>
+<select id="radius">
+<option value="">No distance limit</option>
+<option value="1">1 km</option>
+<option value="3">3 km</option>
+<option value="10">10 km</option>
+<option value="30">30 km</option>
+</select>
+</div>
+<button type="submit">Use coordinates</button>
+<button type="button" id="locate">Use my location</button>
+<button type="button" id="clear-point" class="quiet">Clear point</button>
+</form>
+<div id="presets" class="presets">
+</div>
+<p>Distance is straight-line, not a walking route. Coordinates stay in this tab. Optional background tiles reveal the viewed map area to the tile provider.</p>
+</details>
+<p class="status" id="status" role="status">Opening the saved dataset…</p>
+<div class="workspace">
+<div class="map-panel">
+<div class="map-toolbar">
+<p id="result-count">No data loaded</p>
+<label class="tile-toggle" for="tiles">
+<input id="tiles" type="checkbox">Show street map</label>
+</div>
+<div id="map" role="region" aria-label="Map of matching toilet records">
+</div>
+<div class="legend">
+<span>
+<i class="yes">
+</i>Wheelchair: yes</span>
+<span>
+<i class="limited">
+</i>Limited</span>
+<span>
+<i class="other">
+</i>No / not recorded</span>
+</div>
+<p class="map-note">Points use OSM nodes or a way/relation’s approximate centre. Street tiles are optional; the records and distance calculations work without them.</p>
+<div class="list-heading">
+<h3>Mapped places</h3>
+<span id="page-label">
+</span>
+</div>
+<div id="results" class="results">
+</div>
+<p id="empty" hidden>No mapped places match these filters. This does not establish that no toilets exist.</p>
+<div class="pagination">
+<button id="previous" disabled>Previous</button>
+<button id="next" disabled>Next</button>
+</div>
+</div>
+<aside class="detail">
+<p class="eyebrow">THE SOURCE, IN PLAIN SIGHT</p>
+<h3 id="detail-title">Select a mapped place</h3>
+<p id="detail-location">
+</p>
+<div id="detail-tags">
+</div>
+<p class="caution">A mapped “yes” is a contributor’s report, not a current inspection. Opening hours are shown as written; this page does not claim that a facility is open now.</p>
+<div id="detail-links">
+</div>
+<details>
+<summary>Inspect retained source tags</summary>
+<pre id="raw-tags">
+</pre>
+</details>
+<div class="changes">
+<h4>Since the earlier capture</h4>
+<p id="changes">The first capture establishes a baseline.</p>
+</div>
+</aside>
+</div>
+</section>
+<section id="method" class="method">
+<div>
+<p class="eyebrow">USE THE RECORD, KEEP THE GAPS</p>
+<h2>Mapped isn’t<br>
+<em>guaranteed.</em>
+</h2>
+</div>
+<div>
+<h3>What the map includes</h3>
+<p>These are OpenStreetMap objects tagged <code>amenity=toilets</code> inside configured regional rectangles. Cafés and other venues with toilets may be absent. Duplicate objects and incomplete or outdated tags can occur. A blank field means not recorded, not “no”.</p>
+<h3>Dates mean different things</h3>
+<p>The capture date is when this copy was downloaded. The OSM database date describes the source edition; an object’s last edit can be unrelated to its toilet details. Survey dates are shown only when a contributor recorded one.</p>
+<h3>Your data</h3>
+<p>Search, filters, typed coordinates and imported receipts stay in this tab. Nothing is saved to browser storage. “Use my location” asks your browser for permission and uses the result locally. Turning on the street map contacts OpenStreetMap’s tile server, which sees your IP address and the viewed area. Source links open their named services. Save a receipt before closing to keep a copy.</p>
+<p>Regional records refresh weekly, with eight captures retained by default. GitHub schedules can be delayed or missed. Add regions and tune limits in <a href="https://github.com/jsdyer/restroomreach/blob/main/web/config.json">web/config.json</a>.</p>
+<p class="source-links">
+<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> · <a href="https://opendatacommons.org/licenses/odbl/1-0/">Database: ODbL 1.0</a> · <a href="https://wiki.openstreetmap.org/wiki/Tag:amenity%3Dtoilets">Toilet tag documentation</a> · <a href="https://www.openstreetmap.org/fixthemap">Report a map issue</a> · <a href="https://operations.osmfoundation.org/policies/tiles/">Tile policy</a>
+</p>
+<p>Related: <a href="https://coolcode.ca/trailglass/">Trailglass</a> · <a href="https://coolcode.ca/civiclookup/">Civic Lookup</a> · <a href="https://coolcode.ca/roadpulse/">Road Pulse</a>
+</p>
+</div>
+</section>
+</main>
+<footer>
+<a href="https://coolcode.ca/">CoolCode</a>
+<span>{{ISSUE_LINK}}</span>
+<a href="{{SOURCE_URL}}">Source & customization guide</a>
+</footer>
 </body>
 </html>

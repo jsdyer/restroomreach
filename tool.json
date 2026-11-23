@@ -1,16 +1,25 @@
 {
-  "id": "coolcode-tool-template",
-  "title": "CoolCode Tool Starter",
-  "description": "A browser-only example that trims lines and removes exact duplicates.",
-  "category": "security",
-  "tags": ["text", "lines", "duplicates"],
-  "icon": "scan-search",
-  "url": "/coolcode-tool-template/",
-  "source": "https://github.com/jsdyer/coolcode-tool-template",
+  "id": "restroomreach",
+  "title": "Restroom Reach",
+  "description": "Find mapped toilets, inspect accessibility details and keep a dated local record.",
+  "category": "places",
+  "tags": [
+    "washrooms",
+    "accessibility",
+    "OpenStreetMap",
+    "Langley",
+    "Vancouver",
+    "Halifax",
+    "public toilets"
+  ],
+  "icon": "map",
+  "url": "/restroomreach/",
+  "source": "https://github.com/jsdyer/restroomreach",
   "hosting": "project",
   "access": "browser",
   "data_info": {
-    "mode": "local",
-    "detail": "The browser reads the text you paste and compares its lines."
+    "mode": "snapshot",
+    "detail": "Dated OpenStreetMap toilet extracts with reported access and accessibility tags; map details can be incomplete or old.",
+    "cadence": "Weekly"
   }
 }
