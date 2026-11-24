@@ -89,3 +89,11 @@ Official source documentation:
 ## Validation
 
 Unit tests cover missing-vs-no accessibility, access filtering, coordinates/dateline distance, expandable coverage, source-error rejection, count-collapse safeguards, unsafe IDs, formula-safe exports and retention on failed imports. Browser CI exercises the real saved extract at a project subpath, filtering, distance presets, capture export/import, safe empty results and mobile width. Browser checks use the bundled data and do not query Overpass or download street tiles.
+
+<!-- schedule-reliability -->
+## Schedule reliability
+
+Public GitHub repositories can have scheduled workflows disabled after 60 days of inactivity. A separate weekly [schedule guard](.github/workflows/schedule-guard.yml) calls GitHub's enable-workflow API for an explicit list of refresh workflows and itself. It can restore workflows disabled for inactivity, preserves manually disabled workflows, and runs independently of collection failures.
+
+This is an interim mitigation, not a scheduling guarantee: GitHub does not document active-workflow renewal as a permanent exemption, and scheduled runs can be delayed or dropped. A scheduler on our own Linux server is the planned independent trigger. The guard does not collect data, create dummy commits, or change source/check timestamps; successful collection and published data freshness still need monitoring.
+<!-- /schedule-reliability -->
