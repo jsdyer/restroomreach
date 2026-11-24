@@ -97,3 +97,9 @@ Public GitHub repositories can have scheduled workflows disabled after 60 days o
 
 This is an interim mitigation, not a scheduling guarantee: GitHub does not document active-workflow renewal as a permanent exemption, and scheduled runs can be delayed or dropped. A scheduler on our own Linux server is the planned independent trigger. The guard does not collect data, create dummy commits, or change source/check timestamps; successful collection and published data freshness still need monitoring.
 <!-- /schedule-reliability -->
+
+### Regional download recovery
+
+Each configured region is collected separately, sequentially, using a bounded Overpass POST. A timeout, connection error, or HTTP 500/502/503/504 gets one retry after five seconds. HTTP 403/429 is left for a later watchdog attempt. Every region must pass validation before the published index changes; a partial result cannot replace the previous capture. The oldest source database timestamp is retained across regional responses, separately from the capture time.
+
+Changes to the collector or its region configuration trigger collection on push. Ordinary page edits build the retained snapshot. Scheduled and requested refreshes keep their existing behavior.

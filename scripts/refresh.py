@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Capture a modest set of OSM toilet extracts, never one query per visitor."""
-import argparse, datetime as dt, hashlib, json, math, os, re, tempfile
+import argparse, datetime as dt, hashlib, json, math, os, re, tempfile, time
+from urllib.error import HTTPError, URLError
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
@@ -29,6 +30,42 @@ def valid_config(config):
  return regions
 
 def query_for(regions):return '[out:json][timeout:90];('+''.join('nwr["amenity"="toilets"]('+','.join(str(v) for v in r['bbox'])+');' for r in regions)+');out center meta;'
+def fetch_region(endpoint, region, opener=urlopen, sleep=time.sleep):
+ req=Request(endpoint, data=urlencode({'data':query_for([region])}).encode(),
+             headers={'User-Agent':'CoolCode RestroomReach/1.1 (+https://github.com/jsdyer/restroomreach)',
+                      'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'})
+ for attempt in range(2):
+  try:
+   with opener(req,timeout=120) as response:
+    body=response.read(16*1024*1024+1)
+    if len(body)>16*1024*1024:raise ValueError('Source exceeds response size limit for '+region['id'])
+    source=json.loads(body)
+   if not isinstance(source,dict) or source.get('remark') or not isinstance(source.get('elements'),list):
+    raise ValueError('Overpass returned an incomplete/error response for '+region['id'])
+   return source
+  except HTTPError as exc:
+   if attempt or exc.code not in (500,502,503,504):raise
+  except (TimeoutError,URLError,ConnectionError):
+   if attempt:raise
+  print('Temporary download failure for '+region['id']+'; retrying once in 5 seconds',flush=True)
+  sleep(5)
+
+def collect_regions(config, opener=urlopen, sleep=time.sleep):
+ elements={};editions=[]
+ for region in valid_config(config):
+  print('Collecting '+region['id'],flush=True)
+  source=fetch_region(config['sourceUrl'],region,opener,sleep)
+  base=source.get('osm3s',{}).get('timestamp_osm_base')
+  try: edition=dt.datetime.fromisoformat(base.replace('Z','+00:00'))
+  except (TypeError,AttributeError,ValueError):raise ValueError('Missing OSM database timestamp for '+region['id'])
+  if edition.tzinfo is None:raise ValueError('OSM database timestamp needs a timezone')
+  editions.append((edition,base))
+  for element in source['elements']:
+   key=(element.get('type'),element.get('id'))
+   if key in elements and elements[key]!=element:raise ValueError('Conflicting OSM records between regional extracts')
+   elements[key]=element
+ return {'osm3s':{'timestamp_osm_base':min(editions)[1]},'elements':list(elements.values())}
+
 def normalize(source,config,captured_at):
  regions=valid_config(config)
  if not isinstance(source,dict) or source.get('remark') or not isinstance(source.get('elements'),list):raise ValueError('Overpass returned an incomplete/error response.')
@@ -71,14 +108,7 @@ def atomic_json(path,value):
 def run(root=ROOT,input_path=None):
  config=json.loads((root/'web/config.json').read_text());regions=valid_config(config)
  if input_path:source=json.loads(Path(input_path).read_text())
- else:
-  query=query_for(regions)
-  req=Request(config['sourceUrl']+'?'+urlencode({'data':query}),headers={'User-Agent':'CoolCode RestroomReach/1.0 (+https://github.com/jsdyer/restroomreach)','Accept':'application/json'})
-  # One bounded request per weekly run; no retries on rejection/rate limits.
-  with urlopen(req,timeout=120) as response:
-   body=response.read(16*1024*1024+1)
-   if len(body)>16*1024*1024:raise ValueError('Source exceeds response size limit.')
-   source=json.loads(body)
+ else:source=collect_regions(config)
  data=root/'web/data';index_path=data/'index.json';old_index=json.loads(index_path.read_text()) if index_path.exists() else {'captures':[]}
  old=None
  if old_index['captures']:old=json.loads((data/old_index['captures'][0]['file']).read_text())
