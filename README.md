@@ -4,6 +4,7 @@ A public browser map for finding OpenStreetMap toilet records, inspecting access
 
 <!-- coolcode:guide -->
 Choose a region, then filter wheelchair access, fees or changing tables. **Mapped yes** is a contributor’s report; **Not recorded** is a separate state. Expand **Sort by distance from a point** for coordinates or the Willoughby, Vancouver and Halifax presets. Distances are straight-line, not walking routes. Turn on **Show street map** only when you want background tiles. The capture date and OSM database edition are displayed separately: downloading an old source edition does not make the observations current. Export a receipt to retain the evidence outside this tab.
+A refresh collects all configured regions before publishing; a failed or incomplete region keeps the last good capture available.
 <!-- /coolcode:guide -->
 
 ## What works
@@ -18,7 +19,7 @@ Choose a region, then filter wheelchair access, fees or changing tables. **Mappe
 
 The first capture was downloaded **23 November 2026** from the Private.coffee Overpass instance. Its response explicitly reports an OSM database edition of **15 July 2026**. The app displays both dates. This edition is useful historical mapping evidence, but must not be treated as current availability or a current accessibility survey.
 
-The collector queries the configured endpoint once per run, with an identifying User-Agent, a 90-second query budget and a bounded response size. Scheduled capture runs on **Tuesdays at 08:47 UTC**. Normal code pushes rebuild the retained copy offline. There are no per-visitor Overpass queries and no automatic retries or failover that could multiply load. A source failure, timeout, truncated response, empty region or unexpected count collapse fails the refresh and preserves the last good deployed copy.
+The collector queries each configured region separately and sequentially, with an identifying User-Agent, a 90-second query budget and a bounded response size. Scheduled capture runs on **Tuesdays at 08:47 UTC**. Collector/configuration changes trigger collection; other code pushes rebuild the retained copy offline. A temporary connection failure or HTTP 500/502/503/504 gets one retry after five seconds. HTTP 403/429 does not. There are no per-visitor Overpass queries or automatic endpoint failovers. A source failure, timeout, truncated response, empty region or unexpected count collapse fails the refresh and preserves the last good deployed copy.
 
 The primary overpass-api.de endpoint returned HTTP 502 while seeding this release. Its former Kumi alternative returned 503; the currently documented **overpass.private.coffee** endpoint returned a complete JSON response. These are independent service failures, not evidence of an OSM data deletion.
 
