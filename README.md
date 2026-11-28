@@ -3,9 +3,11 @@
 A public browser map for finding OpenStreetMap toilet records, inspecting accessibility tags and keeping dated evidence. Published at **https://coolcode.ca/restroomreach/**.
 
 <!-- coolcode:guide -->
-Choose an [area guide](https://coolcode.ca/restroomreach/areas/) for Metro Vancouver and Langley, Halifax, central Ottawa or central Winnipeg. See its mapped washrooms, compare wheelchair-access, changing-table and fee tags, and open the matching results on the map. Each guide shows its coverage rectangle and source date. Blank tags are unknown. Distance sorting and the optional street map are available in the finder.
+Choose an area guide for Metro Vancouver and Langley, Halifax, central Ottawa or central Winnipeg. See its mapped washrooms, compare wheelchair-access, changing-table and fee tags, and open the matching results on the map. Each guide shows its coverage rectangle and source date. Blank tags are unknown. Distance sorting and the optional street map are available in the finder.
 A weekly refresh collects all configured regions before publishing. A failed or incomplete region keeps the last good capture available.
 <!-- /coolcode:guide -->
+
+[Browse the published washroom guides by area](https://coolcode.ca/restroomreach/areas/).
 
 ## What works
 
