@@ -32,6 +32,12 @@ def main():
                 expect(page.locator("#coverage")).to_contain_text("mapped toilets")
                 expect(page.locator("#results button").first).to_be_visible()
                 assert page.locator("#map .leaflet-tile-pane img").count() == 0
+                page.get_by_role("link", name="Central Ottawa, Ontario", exact=True).click()
+                expect(page.get_by_role("heading", level=1)).to_contain_text("Central Ottawa")
+                page.get_by_role("link", name="Mapped accessible", exact=False).click()
+                expect(page.locator("#region")).to_have_value("ottawa")
+                expect(page.locator("#wheelchair")).to_have_value("yes")
+                page.locator("#reset").click()
                 page.get_by_label("Region", exact=True).select_option("halifax")
                 expect(page.get_by_label("Region", exact=True)).to_have_value("halifax")
                 page.get_by_label("Wheelchair", exact=True).select_option("yes")

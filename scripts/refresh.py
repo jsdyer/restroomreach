@@ -31,9 +31,9 @@ def valid_config(config):
 
 def query_for(regions):return '[out:json][timeout:90];('+''.join('nwr["amenity"="toilets"]('+','.join(str(v) for v in r['bbox'])+');' for r in regions)+');out center meta;'
 def fetch_region(endpoint, region, opener=urlopen, sleep=time.sleep):
- req=Request(endpoint, data=urlencode({'data':query_for([region])}).encode(),
+ req=Request(endpoint+'?'+urlencode({'data':query_for([region])}),
              headers={'User-Agent':'CoolCode RestroomReach/1.1 (+https://github.com/jsdyer/restroomreach)',
-                      'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'})
+                      'Accept':'application/json'})
  for attempt in range(2):
   try:
    with opener(req,timeout=120) as response:
@@ -94,10 +94,14 @@ def normalize(source,config,captured_at):
  return {'schema':'coolcode.restroomreach.v1','capturedAt':captured_at,'sourceUpdatedAt':base,'source':config['sourceUrl'],'license':'ODbL-1.0','attribution':'© OpenStreetMap contributors','scope':scope,'regions':regions,'records':records}
 
 def check_drop(old,new,config):
- if old and old.get('scope')==new['scope']:
-  for r in new['regions']:
-   before=sum(r['id'] in x['regions'] for x in old['records']);after=sum(r['id'] in x['regions'] for x in new['records'])
-   if before and after<before*(1-config['maximumDropFraction']):raise ValueError('Unexpected regional record drop; previous capture retained.')
+ if not old:return
+ old_regions={r['id']:r['bbox'] for r in old['regions']}
+ for r in new['regions']:
+  if old_regions.get(r['id'])!=r['bbox']:continue
+  before=sum(r['id'] in x['regions'] for x in old['records'])
+  after=sum(r['id'] in x['regions'] for x in new['records'])
+  if before and after<before*(1-config['maximumDropFraction']):
+   raise ValueError('Unexpected regional record drop for '+r['id']+'; previous capture retained.')
 
 def atomic_json(path,value):
  path.parent.mkdir(parents=True,exist_ok=True)

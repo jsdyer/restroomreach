@@ -1,7 +1,7 @@
 {
   "id": "restroomreach",
   "title": "Restroom Reach",
-  "description": "Find mapped toilets, inspect accessibility details and keep a dated local record.",
+  "description": "Find mapped washrooms in Metro Vancouver, Halifax, central Ottawa and central Winnipeg. Explore wheelchair access, changing tables and fees.",
   "category": "places",
   "tags": [
     "washrooms",
@@ -10,7 +10,9 @@
     "Langley",
     "Vancouver",
     "Halifax",
-    "public toilets"
+    "public toilets",
+    "Ottawa",
+    "Winnipeg"
   ],
   "icon": "map",
   "url": "/restroomreach/",
@@ -21,5 +23,9 @@
     "mode": "snapshot",
     "detail": "Dated OpenStreetMap toilet extracts with reported access and accessibility tags; map details can be incomplete or old.",
     "cadence": "Weekly"
+  },
+  "result_directory": {
+    "path": "areas/",
+    "title": "Mapped washroom guides by Canadian area"
   }
 }

@@ -27,13 +27,14 @@
 <main>
 <section class="hero">
 <div>
-<p class="eyebrow">A LITTLE MORE CERTAINTY, ON THE WAY</p>
+
 <h1>Restroom<br>
 <em>Reach.</em>
 </h1>
-<p class="intro">Find a place to stop.<br>Know what’s mapped before you go.</p>
-<p class="hero-note">Community-mapped washrooms, with accessibility details, source links and room for the unknown.</p>
-<a class="hero-link" href="#explore">Find a washroom</a>
+<p class="intro">Find a mapped washroom near your stop.</p>
+<p class="hero-note">Choose an area to see places with mapped wheelchair access, changing tables or free entry.</p>
+{{AREA_LINKS}}
+<a class="hero-link" href="#explore">Open the interactive map</a>
 </div>
 <div class="hero-art" aria-hidden="true">
 <svg viewBox="0 0 400 330">
@@ -47,7 +48,7 @@
 <path d="M48 27h4v43h-4zM30 38h12v24H30zM58 38h12v24H58z" fill="#382959"/>
 </g>
 </svg>
-<span>MAP DETAILS.<br>MAKE YOUR OWN CALL.</span>
+
 </div>
 </section>
 <div class="edition">
@@ -58,8 +59,8 @@
 <section id="explore" aria-labelledby="finder-title">
 <div class="section-heading">
 <div>
-<p class="eyebrow">THE NEARBY DETAILS</p>
-<h2 id="finder-title">A useful stop.</h2>
+
+<h2 id="finder-title">Find a washroom</h2>
 </div>
 <div class="actions">
 <button id="save" disabled>Save receipt JSON</button>
@@ -172,8 +173,8 @@
 <i class="limited">
 </i>Limited</span>
 <span>
-<i class="other">
-</i>No / not recorded</span>
+<i class="no"></i>Mapped no</span>
+<span><i class="other"></i>Other / not recorded</span>
 </div>
 <p class="map-note">Points use OSM nodes or a way/relation’s approximate centre. Street tiles are optional; the records and distance calculations work without them.</p>
 <div class="list-heading">

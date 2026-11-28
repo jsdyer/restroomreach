@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from build import ROOT, build, metadata
@@ -47,6 +48,26 @@ class BuildTests(unittest.TestCase):
                 self.assertEqual('/assets/tool-metrics.js' in page, enabled)
                 self.assertEqual(f'https://coolcode.ca/report/?tool={slug}' in page, enabled)
                 self.assertNotIn("{{", page)
+
+    def test_area_sitemap_and_guides_follow_captured_regions(self):
+        build(self.root)
+        output = self.root / "dist"
+        capture_index = json.loads((output / "data/index.json").read_text())
+        capture = json.loads((output / "data" / capture_index["captures"][0]["file"]).read_text())
+        ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+        actual = {entry.text for entry in ET.parse(output / "sitemap.xml").findall("s:url/s:loc", ns)}
+        base = "https://coolcode.ca/restroomreach/areas/"
+        expected = {base}
+        for region in capture["regions"]:
+            key = region["id"]
+            expected.add(f"{base}{key}/")
+            page = (output / "areas" / key / "index.html").read_text()
+            records = [r for r in capture["records"] if key in r["regions"]]
+            unknown = sum(not r["tags"].get("wheelchair") for r in records)
+            self.assertIn(f"?region={key}&amp;wheelchair=unknown#explore", page)
+            self.assertIn(f"Unrecorded ({unknown:,})", page)
+            self.assertIn(f"Open all {len(records):,} places", page)
+        self.assertEqual(actual, expected)
 
     def test_url_matches_tool_id(self):
         self.edit(url="/different/")

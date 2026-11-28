@@ -27,6 +27,34 @@
         44.6488,
         -63.5752
       ]
+    },
+    {
+      "id": "ottawa",
+      "name": "Central Ottawa, Ontario",
+      "bbox": [
+        45.375,
+        -75.698,
+        45.423,
+        -75.645
+      ],
+      "center": [
+        45.409,
+        -75.675
+      ]
+    },
+    {
+      "id": "winnipeg",
+      "name": "Central Winnipeg, Manitoba",
+      "bbox": [
+        49.855,
+        -97.166,
+        49.91,
+        -97.099
+      ],
+      "center": [
+        49.889,
+        -97.136
+      ]
     }
   ],
   "defaultRegion": "metro-vancouver",
@@ -48,9 +76,21 @@
       "region": "halifax",
       "lat": 44.6488,
       "lon": -63.5752
+    },
+    {
+      "name": "Ottawa City Hall",
+      "region": "ottawa",
+      "lat": 45.4201,
+      "lon": -75.6891
+    },
+    {
+      "name": "The Forks, Winnipeg",
+      "region": "winnipeg",
+      "lat": 49.8883,
+      "lon": -97.1316
     }
   ],
-  "sourceUrl": "https://overpass.private.coffee/api/interpreter",
+  "sourceUrl": "https://overpass.openstreetmap.fr/api/interpreter",
   "tileUrl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
   "tileAttribution": "\u00a9 OpenStreetMap contributors",
   "minimumRecordsPerRegion": 1,

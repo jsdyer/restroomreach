@@ -7,6 +7,7 @@ import re
 import shutil
 import tempfile
 from urllib.parse import urlsplit
+from area_pages import build_areas
 
 ROOT = Path(__file__).resolve().parents[1]
 SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
@@ -14,10 +15,10 @@ SLUG = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 
 def metadata(root=ROOT):
     tool = json.loads((root / "tool.json").read_text(encoding="utf-8"))
-    required = {"id", "title", "description", "category", "tags", "icon", "url", "source", "hosting", "access", "data_info"}
+    required = {"id", "title", "description", "category", "tags", "icon", "url", "source", "hosting", "access", "data_info", "result_directory"}
     if not isinstance(tool, dict) or set(tool) != required:
         raise ValueError("tool.json has missing or unknown fields")
-    for key in required - {"tags", "data_info"}:
+    for key in required - {"tags", "data_info", "result_directory"}:
         if not isinstance(tool[key], str) or not tool[key].strip():
             raise ValueError(f"tool.json: {key} must be a nonempty string")
     if not SLUG.fullmatch(tool["id"]) or tool["url"] != f'/{tool["id"]}/' or tool["hosting"] != "project":
@@ -58,6 +59,7 @@ def build(root=ROOT):
             if placeholder not in page:
                 raise ValueError(f"Missing template placeholder: {placeholder}")
             page = page.replace(placeholder, escape(tool[key], quote=True))
+        page = page.replace("{{AREA_LINKS}}", build_areas(stage, tool))
         slug = tool["id"]
         on_coolcode = (
             slug != "coolcode-tool-template"

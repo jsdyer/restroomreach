@@ -11,12 +11,12 @@ class Downloads(unittest.TestCase):
  def test_regions_are_sequential_bounded_and_keep_oldest_edition(self):
   calls=[]
   def opener(req,timeout):
-   i=len(calls);calls.append(req.data.decode());self.assertEqual(timeout,120)
+   i=len(calls);calls.append(req.full_url);self.assertEqual(timeout,120)
    return io.BytesIO(json.dumps(self.source(i)).encode())
   result=collect_regions(self.cfg,opener,lambda _:None)
-  self.assertEqual(len(calls),2);self.assertTrue(all(x.count('nwr')==1 for x in calls))
+  self.assertEqual(len(calls),len(self.cfg["regions"]));self.assertTrue(all(x.count('nwr')==1 for x in calls))
   self.assertEqual(result['osm3s']['timestamp_osm_base'],'2026-11-23T00:00:00Z')
-  self.assertEqual(len(normalize(result,self.cfg,'2026-11-24T00:00:00Z')['records']),2)
+  self.assertEqual(len(normalize(result,self.cfg,'2026-11-24T00:00:00Z')['records']),len(self.cfg['regions']))
  def test_timeout_retries_once_but_rejections_do_not(self):
   for error,wanted in [(TimeoutError('timeout'),2),(HTTPError('https://example.test',429,'rate limit',{},None),1),(HTTPError('https://example.test',403,'blocked',{},None),1)]:
    calls=[]
